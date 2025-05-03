@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Face Attendance System</title>
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2ecc71;
+            --accent-color: #f39c12;
+            --background-color: #f5f7fa;
+            --text-color: #34495e;
+            --card-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+            text-align: center;
+        }
+        
+        header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 1.5rem 0;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+        
+        header h1 {
+            font-size: 2.2rem;
+            font-weight: 600;
+        }
+        
+        .card {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: var(--card-shadow);
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        .options {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            margin: 2rem 0;
+            flex-wrap: wrap;
+        }
+        
+        .option-button {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 1.5rem;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: var(--card-shadow);
+            transition: transform 0.2s, box-shadow 0.2s;
+            min-width: 200px;
+            text-decoration: none;
+            color: var(--text-color);
+        }
+        
+        .option-button:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
+        }
+        
+        .option-button.primary {
+            border-top: 4px solid var(--primary-color);
+        }
+        
+        .option-button.secondary {
+            border-top: 4px solid var(--secondary-color);
+        }
+        
+        .option-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+        
+        .option-button h3 {
+            margin-bottom: 0.5rem;
+        }
+        
+        .option-button p {
+            font-size: 0.9rem;
+            color: #7f8c8d;
+        }
+        
+        .upload-section {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: var(--card-shadow);
+            padding: 2rem;
+            margin: 2rem 0;
+        }
+        
+        .upload-form {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .file-input-wrapper {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+            cursor: pointer;
+            width: 100%;
+            max-width: 300px;
+        }
+        
+        .file-input-wrapper input[type=file] {
+            position: absolute;
+            left: 0;
+            top: 0;
+            opacity: 0;
+            cursor: pointer;
+            width: 100%;
+            height: 100%;
+        }
+        
+        .file-input-label {
+            display: block;
+            background-color: #ecf0f1;
+            color: #7f8c8d;
+            text-align: center;
+            padding: 1rem;
+            border-radius: 4px;
+            border: 2px dashed #bdc3c7;
+            transition: all 0.3s;
+        }
+        
+        .file-input-wrapper:hover .file-input-label {
+            background-color: #e0e6e9;
+            border-color: #95a5a6;
+        }
+        
+        .submit-button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            font-size: 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin-top: 1rem;
+        }
+        
+        .submit-button:hover {
+            background-color: #2980b9;
+        }
+        
+        .success-message {
+            background-color: rgba(46, 204, 113, 0.1);
+            border-left: 4px solid var(--secondary-color);
+            padding: 1rem;
+            border-radius: 4px;
+            margin-top: 1.5rem;
+        }
+        
+        footer {
+            margin-top: 3rem;
+            padding: 1.5rem 0;
+            text-align: center;
+            background-color: #ecf0f1;
+            color: #7f8c8d;
+            font-size: 0.9rem;
+        }
+        
+        @media (max-width: 768px) {
+            .options {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .option-button {
+                width: 90%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Face Recognition Attendance System</h1>
+    </header>
+    
+    <div class="container">
+        <div class="card">
+            <h2>Welcome to the Smart Attendance System</h2>
+            <p>Choose an option below to get started</p>
+            
+            <div class="options">
+                <a href="/register" class="option-button primary">
+                    <div class="option-icon">👤</div>
+                    <h3>Register New Face</h3>
+                    <p>Add a new student or employee to the system</p>
+                </a>
+                
+                <a href="/attendance" class="option-button secondary">
+                    <div class="option-icon">📋</div>
+                    <h3>Take Attendance</h3>
+                    <p>Use webcam to automatically mark attendance</p>
+                </a>
+            </div>
+        </div>
+        
+        <div class="upload-section">
+            <h2>Quick Recognition</h2>
+            <p>Upload an image to recognize and mark attendance</p>
+            
+            <form method="POST" enctype="multipart/form-data" class="upload-form">
+                <div class="file-input-wrapper">
+                    <input type="file" name="image" accept="image/*" required id="file-input">
+                    <label for="file-input" class="file-input-label">
+                        <i>📁</i> Choose an image file
+                    </label>
+                </div>
+                <button type="submit" class="submit-button">Upload & Recognize</button>
+            </form>
+            
+            {% if name %}
+            <div class="success-message">
+                <h3>Welcome, {{ name }}!</h3>
+                <p>Your attendance has been successfully marked.</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    
+    <footer>
+        <p>&copy; 2025 Face Recognition Attendance System</p>
+    </footer>
+    
+    <script>
+        // Update file input label with selected filename
+        document.getElementById('file-input').addEventListener('change', function(e) {
+            const fileName = e.target.files[0]?.name;
+            const label = document.querySelector('.file-input-label');
+            label.innerHTML = fileName ? `<i>📁</i> ${fileName}` : '<i>📁</i> Choose an image file';
+        });
+    </script>
+</body>
+</html>

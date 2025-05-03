@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Attendance - Face Recognition System</title>
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2ecc71;
+            --accent-color: #f39c12;
+            --background-color: #f5f7fa;
+            --text-color: #34495e;
+            --card-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+            text-align: center;
+        }
+        
+        header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 1.5rem 0;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+        
+        header h1 {
+            font-size: 2.2rem;
+            font-weight: 600;
+        }
+        
+        .card {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: var(--card-shadow);
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        .webcam-container {
+            margin: 1.5rem auto;
+            position: relative;
+            max-width: 480px;
+        }
+        
+        #video {
+            width: 100%;
+            height: auto;
+            border-radius: 8px;
+            box-shadow: var(--card-shadow);
+        }
+        
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 1rem auto;
+            padding: 0.5rem;
+            border-radius: 4px;
+            background-color: rgba(52, 152, 219, 0.1);
+            max-width: 480px;
+        }
+        
+        .status-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: #95a5a6;
+            margin-right: 8px;
+        }
+        
+        .status-dot.active {
+            background-color: var(--secondary-color);
+            animation: pulse 1.5s infinite;
+        }
+        
+        .recognition-log {
+            margin-top: 2rem;
+            max-height: 200px;
+            overflow-y: auto;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: var(--card-shadow);
+            text-align: left;
+            padding: 1rem;
+        }
+        
+        .recognition-item {
+            padding: 0.5rem;
+            border-bottom: 1px solid #ecf0f1;
+        }
+        
+        .recognition-item:last-child {
+            border-bottom: none;
+        }
+        
+        .success-item {
+            border-left: 3px solid var(--secondary-color);
+            padding-left: 0.5rem;
+        }
+        
+        .button {
+            display: inline-block;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            font-size: 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            text-decoration: none;
+            margin-top: 1rem;
+        }
+        
+        .button:hover {
+            background-color: #2980b9;
+        }
+        
+        .button.secondary {
+            background-color: #95a5a6;
+        }
+        
+        .button.secondary:hover {
+            background-color: #7f8c8d;
+        }
+        
+        @keyframes pulse {
+            0% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.5;
+            }
+            100% {
+                opacity: 1;
+            }
+        }
+        
+        footer {
+            margin-top: 3rem;
+            padding: 1.5rem 0;
+            text-align: center;
+            background-color: #ecf0f1;
+            color: #7f8c8d;
+            font-size: 0.9rem;
+        }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: var(--secondary-color);
+            color: white;
+            padding: 1rem;
+            border-radius: 4px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            opacity: 0;
+            transition: opacity 0.3s;
+            z-index: 100;
+        }
+        
+        .notification.show {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Face Recognition Attendance System</h1>
+    </header>
+    
+    <div class="container">
+        <div class="card">
+            <h2>Automatic Attendance Tracking</h2>
+            <p>The system will automatically scan for faces and mark attendance</p>
+            
+            <div class="webcam-container">
+                <video id="video" autoplay></video>
+                <canvas id="canvas" style="display:none;"></canvas>
+            </div>
+            
+            <div class="status-indicator">
+                <div class="status-dot active" id="status-dot"></div>
+                <span id="status-text">Scanning for faces...</span>
+            </div>
+            
+            <div class="recognition-log" id="recognition-log">
+                <div class="recognition-item">Waiting for recognitions...</div>
+            </div>
+            
+            <div class="controls">
+                <a href="/" class="button">Back to Home</a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="notification" id="notification">
+        <span id="notification-text"></span>
+    </div>
+    
+    <footer>
+        <p>&copy; 2025 Face Recognition Attendance System</p>
+    </footer>
+    
+    <script>
+        const video = document.getElementById("video");
+        const canvas = document.getElementById("canvas");
+        const ctx = canvas.getContext("2d");
+        const statusDot = document.getElementById("status-dot");
+        const statusText = document.getElementById("status-text");
+        const recognitionLog = document.getElementById("recognition-log");
+        const notification = document.getElementById("notification");
+        const notificationText = document.getElementById("notification-text");
+        
+        // Set up the video stream
+        navigator.mediaDevices.getUserMedia({ video: true })
+            .then(stream => {
+                video.srcObject = stream;
+                statusText.textContent = "Camera connected. Scanning for faces...";
+            })
+            .catch(err => {
+                statusDot.classList.remove("active");
+                statusText.textContent = "Camera error: " + err.message;
+            });
+        
+        // Adjust canvas dimensions to match video
+        video.addEventListener('loadedmetadata', () => {
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+        });
+        
+        // Show notification
+        function showNotification(message) {
+            notificationText.textContent = message;
+            notification.classList.add("show");
+            
+            setTimeout(() => {
+                notification.classList.remove("show");
+            }, 3000);
+        }
+        
+        // Show warning notification
+        function showWarningNotification(message) {
+            notificationText.textContent = message;
+            notification.style.backgroundColor = "#e74c3c"; // Red color for warning
+            notification.classList.add("show");
+            
+            setTimeout(() => {
+                notification.classList.remove("show");
+                notification.style.backgroundColor = "var(--secondary-color)"; // Reset to default
+            }, 3000);
+        }
+        
+        // Add recognition to log
+        function addToLog(name) {
+            const time = new Date().toLocaleTimeString();
+            const item = document.createElement("div");
+            item.className = "recognition-item success-item";
+            item.innerHTML = `<strong>${time}:</strong> ${name} marked present`;
+            
+            recognitionLog.prepend(item);
+            
+            // Remove old entries if there are too many
+            if (recognitionLog.children.length > 20) {
+                recognitionLog.removeChild(recognitionLog.lastChild);
+            }
+        }
+        
+        // Add unknown face to log
+        function addUnknownToLog() {
+            const time = new Date().toLocaleTimeString();
+            const item = document.createElement("div");
+            item.className = "recognition-item warning-item";
+            item.innerHTML = `<strong>${time}:</strong> Unknown face detected - attendance not marked`;
+            
+            recognitionLog.prepend(item);
+            
+            // Remove old entries if there are too many
+            if (recognitionLog.children.length > 20) {
+                recognitionLog.removeChild(recognitionLog.lastChild);
+            }
+        }
+        
+        // Perform face recognition at intervals
+        setInterval(() => {
+            statusDot.classList.add("active");
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+            const image = canvas.toDataURL("image/png");
+            
+            fetch("/mark_attendance", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ image_data: image })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.status === "marked") {
+                    showNotification(`Marked Present: ${data.name}`);
+                    addToLog(data.name);
+                } else if (data.status === "unknown_face") {
+                    // Handle unknown face detection
+                    showWarningNotification("Unknown face detected");
+                    addUnknownToLog();
+                } else if (data.status === "no_face") {
+                    // No need to show notification for no face
+                    statusText.textContent = "No face detected. Please position yourself in front of the camera.";
+                }
+            })
+            .catch(err => {
+                statusDot.classList.remove("active");
+                statusText.textContent = "Error connecting to server";
+                console.error("Error:", err);
+            });
+        }, 5000);
+    </script>
+</body>
+</html>

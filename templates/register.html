@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - Face Recognition System</title>
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2ecc71;
+            --accent-color: #f39c12;
+            --background-color: #f5f7fa;
+            --text-color: #34495e;
+            --card-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+            text-align: center;
+        }
+        
+        header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 1.5rem 0;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+        
+        header h1 {
+            font-size: 2.2rem;
+            font-weight: 600;
+        }
+        
+        .card {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: var(--card-shadow);
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        .registration-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2rem;
+        }
+        
+        @media (min-width: 768px) {
+            .registration-container {
+                flex-direction: row;
+                align-items: flex-start;
+            }
+            
+            .webcam-section, .form-section {
+                flex: 1;
+            }
+        }
+        
+        .webcam-section {
+            text-align: center;
+        }
+        
+        .webcam-container {
+            margin: 1.5rem auto;
+            position: relative;
+            max-width: 320px;
+        }
+        
+        #video {
+            width: 100%;
+            height: auto;
+            border-radius: 8px;
+            box-shadow: var(--card-shadow);
+        }
+        
+        .preview-container {
+            margin: 1rem auto;
+            max-width: 320px;
+            display: none;
+        }
+        
+        #preview {
+            width: 100%;
+            height: auto;
+            border-radius: 8px;
+            border: 2px solid var(--secondary-color);
+        }
+        
+        .form-section {
+            text-align: left;
+        }
+        
+        .input-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+        
+        input[type="text"] {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1px solid #dcdfe6;
+            border-radius: 4px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+        
+        input[type="text"]:focus {
+            border-color: var(--primary-color);
+            outline: none;
+        }
+        
+        .button {
+            display: inline-block;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            font-size: 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            text-decoration: none;
+        }
+        
+        .button:hover {
+            background-color: #2980b9;
+        }
+        
+        .button.secondary {
+            background-color: #95a5a6;
+        }
+        
+        .button.secondary:hover {
+            background-color: #7f8c8d;
+        }
+        
+        .button.success {
+            background-color: var(--secondary-color);
+        }
+        
+        .button.success:hover {
+            background-color: #27ae60;
+        }
+        
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            margin: 1rem 0;
+            padding: 0.5rem;
+            border-radius: 4px;
+            background-color: rgba(52, 152, 219, 0.1);
+        }
+        
+        .status-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: #95a5a6;
+            margin-right: 8px;
+        }
+        
+        .status-dot.active {
+            background-color: var(--secondary-color);
+        }
+        
+        footer {
+            margin-top: 3rem;
+            padding: 1.5rem 0;
+            text-align: center;
+            background-color: #ecf0f1;
+            color: #7f8c8d;
+            font-size: 0.9rem;
+        }
+        
+        .controls {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 1.5rem;
+        }
+        
+        .success-message {
+            background-color: rgba(46, 204, 113, 0.1);
+            border-left: 4px solid var(--secondary-color);
+            padding: 1rem;
+            border-radius: 4px;
+            margin-top: 1.5rem;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Face Recognition Attendance System</h1>
+    </header>
+    
+    <div class="container">
+        <div class="card">
+            <h2>Register New Face</h2>
+            <p>Register a new student or employee for face recognition attendance</p>
+            
+            <div class="registration-container">
+                <div class="webcam-section">
+                    <h3>Capture Face</h3>
+                    <div class="status-indicator">
+                        <div class="status-dot active" id="status-dot"></div>
+                        <span id="status-text">Camera active</span>
+                    </div>
+                    
+                    <div class="webcam-container">
+                        <video id="video" width="320" height="240" autoplay></video>
+                        <canvas id="canvas" width="320" height="240" style="display:none;"></canvas>
+                    </div>
+                    
+                    <div class="preview-container" id="preview-container">
+                        <h3>Preview</h3>
+                        <img id="preview" src="" alt="Captured face" />
+                    </div>
+                    
+                    <button id="recapture-btn" class="button secondary" style="display:none;">Recapture</button>
+                </div>
+                
+                <div class="form-section">
+                    <h3>Personal Information</h3>
+                    <form id="form" method="POST" enctype="multipart/form-data">
+                        <div class="input-group">
+                            <label for="username">Full Name</label>
+                            <input type="text" id="username" name="username" placeholder="Enter full name" required>
+                        </div>
+                        
+                        <div class="input-group">
+                            <label for="classroom">Class/Department</label>
+                            <input type="text" id="classroom" name="classroom" placeholder="Class (e.g., A1) or Department" required>
+                        </div>
+                        
+                        <input type="hidden" name="image_data" id="image_data">
+                        
+                        <div id="capture-btn-container">
+                            <button type="button" id="capture-btn" class="button success">Capture Face</button>
+                        </div>
+                        
+                        <div id="submit-btn-container" style="display:none;">
+                            <button type="button" onclick="submitForm()" class="button success">Register</button>
+                        </div>
+                    </form>
+                    
+                    <div class="success-message" id="success-message">
+                        <h3>Registration Successful!</h3>
+                        <p id="success-text"></p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="controls">
+                <a href="/" class="button">Back to Home</a>
+            </div>
+        </div>
+    </div>
+    
+    <footer>
+        <p>&copy; 2025 Face Recognition Attendance System</p>
+    </footer>
+    
+    <script>
+        const video = document.getElementById("video");
+        const canvas = document.getElementById("canvas");
+        const ctx = canvas.getContext("2d");
+        const statusDot = document.getElementById("status-dot");
+        const statusText = document.getElementById("status-text");
+        const captureBtn = document.getElementById("capture-btn");
+        const recaptureBtn = document.getElementById("recapture-btn");
+        const previewContainer = document.getElementById("preview-container");
+        const preview = document.getElementById("preview");
+        const captureBtnContainer = document.getElementById("capture-btn-container");
+        const submitBtnContainer = document.getElementById("submit-btn-container");
+        const successMessage = document.getElementById("success-message");
+        const successText = document.getElementById("success-text");
+        const form = document.getElementById("form");
+        
+        // Start video stream
+        navigator.mediaDevices.getUserMedia({ video: true })
+            .then(stream => {
+                video.srcObject = stream;
+                statusText.textContent = "Camera active - Ready to capture";
+            })
+            .catch(err => {
+                statusDot.classList.remove("active");
+                statusText.textContent = "Camera error: " + err.message;
+                captureBtn.disabled = true;
+            });
+        
+        // Capture button click handler
+        captureBtn.addEventListener("click", captureImage);
+        
+        // Recapture button click handler
+        recaptureBtn.addEventListener("click", function() {
+            previewContainer.style.display = "none";
+            recaptureBtn.style.display = "none";
+            captureBtnContainer.style.display = "block";
+            submitBtnContainer.style.display = "none";
+        });
+        
+        function captureImage() {
+            ctx.drawImage(video, 0, 0, 320, 240);
+            const dataURL = canvas.toDataURL("image/png");
+            document.getElementById("image_data").value = dataURL;
+            
+            // Show preview
+            preview.src = dataURL;
+            previewContainer.style.display = "block";
+            recaptureBtn.style.display = "inline-block";
+            
+            // Show submit button, hide capture button
+            captureBtnContainer.style.display = "none";
+            submitBtnContainer.style.display = "block";
+        }
+        
+        function submitForm() {
+            const username = document.getElementById("username").value;
+            const classroom = document.getElementById("classroom").value;
+            
+            if (!username || !classroom) {
+                alert("Please fill in all required fields");
+                return;
+            }
+            
+            const imageData = document.getElementById("image_data").value;
+            if (!imageData) {
+                alert("Please capture your face image");
+                return;
+            }
+            
+            // Submit the form
+            const formData = new FormData(form);
+            
+            fetch("/register", {
+                method: "POST",
+                body: formData
+            })
+            .then(response => response.text())
+            .then(data => {
+                // Show success message
+                successText.textContent = `${username} has been registered successfully in ${classroom}.`;
+                successMessage.style.display = "block";
+                
+                // Reset form
+                setTimeout(() => {
+                    window.location.href = "/";
+                }, 3000);
+            })
+            .catch(error => {
+                console.error("Error:", error);
+                alert("An error occurred during registration. Please try again.");
+            });
+        }
+    </script>
+</body>
+</html>
